@@ -16,10 +16,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        // Client 설정
         ClientOptions clientOptions = ClientOptions.builder()
                 .protocolVersion(ProtocolVersion.RESP2)
-                .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+                .pingBeforeActivateConnection(true)
                 .build();
 
         LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
@@ -27,7 +26,6 @@ public class RedisConfig {
                 .commandTimeout(Duration.ofSeconds(10))
                 .build();
 
-        // 서버 설정
         RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration();
         serverConfig.setHostName("localhost");
         serverConfig.setPort(6379);

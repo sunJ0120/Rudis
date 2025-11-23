@@ -1,8 +1,13 @@
 package sunj.be.config;
 
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.protocol.ProtocolVersion;
+import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -11,7 +16,23 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory("localhost", 6379);
+        // Client 설정
+        ClientOptions clientOptions = ClientOptions.builder()
+                .protocolVersion(ProtocolVersion.RESP2)
+                .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+                .build();
+
+        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+                .clientOptions(clientOptions)
+                .commandTimeout(Duration.ofSeconds(10))
+                .build();
+
+        // 서버 설정
+        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration();
+        serverConfig.setHostName("localhost");
+        serverConfig.setPort(6379);
+
+        return new LettuceConnectionFactory(serverConfig, clientConfig);
     }
 
     @Bean

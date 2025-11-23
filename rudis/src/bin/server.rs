@@ -42,62 +42,94 @@ async fn handle_connection(
         };
 
         let input = String::from_utf8_lossy(&buf[..n]);
-        let input = input.trim();
+        let input = input.trim().to_string();  // ← String으로 변환
 
-        // RESP 형식인지 확인하고 파싱 하도록 지원
-        let _command_string = if input.starts_with('*') {
-            match RespValue::parse(input) {
-                Ok(resp) => {
-                    match resp.to_command_string() {
-                        Ok(cmd) => cmd,
-                        Err(e) => {
-                            let error_resp = format!("-ERR {}\r\n", e);
-                            let _ = socket.write_all(error_resp.as_bytes()).await;
-                            continue;
+        // 각 *로 시작하는 명령어들 분리
+        let mut commands = Vec::new();
+        let mut current_cmd = String::new();
+
+        for ch in input.chars() {
+            if ch == '*' && !current_cmd.is_empty() {
+                commands.push(current_cmd.clone());
+                current_cmd.clear();
+                current_cmd.push(ch);
+            } else {
+                current_cmd.push(ch);
+            }
+        }
+        if !current_cmd.is_empty() {
+            commands.push(current_cmd);
+        }
+
+        for cmd_input in commands {
+            let cmd_input = cmd_input.trim();
+            if cmd_input.is_empty() {
+                continue;
+            }
+
+            // 여기서부터 기존 처리 로직 시작
+            let command_string = if cmd_input.starts_with('*') {
+                match RespValue::parse(cmd_input) {
+                    Ok(resp) => {
+                        match resp.to_command_string() {
+                            Ok(cmd) => {
+                                cmd
+                            },
+                            Err(e) => {
+                                let error_resp = format!("-ERR {}\r\n", e);
+                                let _ = socket.write_all(error_resp.as_bytes()).await;
+                                let _ = socket.flush().await;
+                                continue;
+                            }
                         }
+                    }
+                    Err(e) => {
+                        let error_resp = format!("-ERR RESP 파싱 실패: {}\r\n", e);
+                        let _ = socket.write_all(error_resp.as_bytes()).await;
+                        let _ = socket.flush().await;
+                        continue;
+                    }
+                }
+            } else {
+                cmd_input.to_string()
+            };
+
+            // Command 파싱 및 실행
+            match Command::parse(&command_string) {
+                Ok(cmd) => {
+                    let response = cmd.execute(&store);
+                    let resp_response = to_resp_format(&response);
+
+                    if let Err(e) = socket.write_all(resp_response.as_bytes()).await {
+                        return;
+                    }
+
+                    if let Err(e) = socket.flush().await {
+                        return;
                     }
                 }
                 Err(e) => {
-                    let error_resp = format!("-ERR RESP 파싱 실패: {}\r\n", e);
-                    let _ = socket.write_all(error_resp.as_bytes()).await;
-                    continue;
-                }
-            }
-        } else {
-            println!("📝 일반 텍스트 명령");
-            input.to_string()
-        };
-
-        // 기존의 Command 활용해서 파싱
-        match Command::parse(&_command_string) {
-            Ok(cmd) => {
-                let response = cmd.execute(&store);
-                let resp_response = to_resp_format(&response);
-
-                if let Err(e) = socket.write_all(resp_response.as_bytes()).await {
-                    eprintln!("😭 소켓에 응답을 쓰는데 실패하였습니다: {}", e);
-                    return;
-                }
-            }
-            Err(e) => {
-                let error_resp = format!("-ERR {}\r\n", e);
-                if let Err(e) = socket.write_all(error_resp.as_bytes()).await {
-                    eprintln!("😭 소켓에 에러 응답을 쓰는데 실패하였습니다: {}", e);
-                    return;
+                    let error_resp = format!("-ERR {}\r\n", e);
+                    if let Err(e) = socket.write_all(error_resp.as_bytes()).await {
+                        return;
+                    }
+                    if let Err(e) = socket.flush().await {
+                        return;
+                    }
                 }
             }
         }
     }
 }
 
-// 응답을 RESP 형식으로 변환한다.
+// 응답을 RESP 형식으로 변환
 fn to_resp_format(response: &str) -> String {
     match response {
         "OK" => "+OK\r\n".to_string(),
+        "PONG" => "+PONG\r\n".to_string(),
         "(nil)" => "$-1\r\n".to_string(),
         s if s.starts_with("ERR") => format!("-{}\r\n", s),
-        s => {
-            format!("${}\r\n{}\r\n", s.len(), s)
-        }
+        s if s.parse::<i64>().is_ok() => format!(":{}\r\n", s),
+        s => format!("${}\r\n{}\r\n", s.len(), s)
     }
 }

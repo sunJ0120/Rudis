@@ -1,6 +1,12 @@
 server:
   port: 8090
 
+logging:
+  level:
+    io.lettuce: DEBUG
+    org.springframework.data.redis: DEBUG
+    sunj.be: DEBUG
+
 spring:
   data:
     redis:

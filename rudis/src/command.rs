@@ -7,6 +7,14 @@ pub enum Command {
     Del { key: String },
     Expire { key: String, seconds: i64 },
     Ttl { key: String },
+
+    Ping,
+    ClientSetName { name: String },
+    ClientSetInfo { data: String },
+    Hello { version: i64 },
+    Info,
+    Quit,
+
     Exit,
     Unknown,
 }
@@ -44,7 +52,32 @@ impl Command {
                 key: key.to_string(),
             }),
 
-            ["EXIT"] | ["exit"] | ["QUIT"] | ["quit"] => Ok(Command::Exit),
+            // CLIENT SETNAME xxx
+            ["CLIENT", "SETNAME", name] => Ok(Command::ClientSetName { name: name.to_string() }),
+
+            // CLIENT SETINFO xxx yyy
+            ["CLIENT", "SETINFO", ..] => {
+                // SETINFO는 여러 파라미터가 올 수 있으니 나머지 다 받기
+                let data = parts[2..].join(" ");
+                Ok(Command::ClientSetInfo { data })
+            },
+
+            // HELLO 2
+            ["HELLO", ver] => {
+                let version = ver.parse::<i64>().unwrap_or(2);
+                Ok(Command::Hello { version })
+            }
+
+            // HELLO (기본 RESP2)
+            ["HELLO"] => Ok(Command::Hello { version: 2 }),
+
+            ["INFO"] => Ok(Command::Info),
+
+            ["QUIT"] => Ok(Command::Quit),
+
+            ["EXIT"] | ["exit"] => Ok(Command::Exit),
+
+            ["PING"] => Ok(Command::Ping),
 
             [] => Err("빈 명령어 입니다.".to_string()),
 
@@ -78,12 +111,26 @@ impl Command {
                 store.ttl(key.as_str()).to_string()
             }
 
-            Command::Exit => {
-                "🦀 Rudis를 종료합니다.".to_string()
+            Command::Ping => "PONG".to_string(),
+
+            Command::ClientSetName { .. } => "OK".to_string(),
+
+            Command::ClientSetInfo { .. } => "OK".to_string(),
+
+            Command::Hello { version } => {
+                format!("server,redis,proto,{},role,master,id,1", version)
             }
 
+            Command::Info => {
+                "# Server\r\nredis_version:7.0.0\r\nrole:master\r\n".to_string()
+            }
+
+            Command::Quit => "OK".to_string(),
+
+            Command::Exit => "OK".to_string(),
+
             Command::Unknown => {
-                "👀 알 수 없는 명령어 입니다.".to_string()
+                "ERR Unknown command".to_string()
             }
         }
     }

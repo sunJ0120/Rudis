@@ -1,0 +1,50 @@
+services:
+  # Rudis Redis 클론 서버
+  rudis:
+    build:
+      context: ./rudis
+      dockerfile: Dockerfile
+    container_name: rudis-server
+    ports:
+      - "6379:6379"
+    networks:
+      - rudis-network
+    environment:
+      - RUST_LOG=info
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6379", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Spring Boot 성능 테스트 서버
+  spring-load-tester:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    container_name: spring-be
+    ports:
+      - "8080:8080"
+    depends_on:
+      rudis:
+        condition: service_healthy
+#      prometheus:
+#        condition: service_started
+    networks:
+      - rudis-network
+    environment:
+      - REDIS_HOST=rudis
+      - REDIS_PORT=6379
+#      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=prometheus
+
+  # Prometheus: 메트릭 수집
+
+  # Grafana: 메트릭 시각화
+
+networks:
+  rudis-network:
+    driver: bridge
+
+#volumes:
+#  prometheus-data:
+#  grafana-data:

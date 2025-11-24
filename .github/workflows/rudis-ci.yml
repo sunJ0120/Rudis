@@ -1,0 +1,53 @@
+name: Rudis CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: [ 'rudis/**' ]
+  pull_request:
+    branches: [ main, develop ]
+    paths: [ 'rudis/**' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v3
+        with:
+          path: rudis/target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run tests
+        working-directory: rudis
+        run: cargo test --verbose
+
+      - name: Run clippy (lint)
+        working-directory: rudis
+        run: cargo clippy -- -D warnings
+
+      - name: Check formatting
+        working-directory: rudis
+        run: cargo fmt -- --check
+
+      - name: Build release
+        working-directory: rudis
+        run: cargo build --release

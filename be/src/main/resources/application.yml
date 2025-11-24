@@ -10,7 +10,7 @@ logging:
 spring:
   data:
     redis:
-      host: localhost
+      host: rudis
       port: 6379
 
 management:

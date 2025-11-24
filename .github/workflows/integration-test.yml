@@ -1,0 +1,52 @@
+name: Integration Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docker-compose-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start services
+        run: docker compose up -d --build
+
+      - name: Wait for Rudis
+        run: |
+          for i in {1..30}; do
+            if docker compose exec -T rudis redis-cli ping > /dev/null 2>&1; then
+              echo "✓ Rudis is ready"
+              exit 0
+            fi
+            echo "Attempt $i: Waiting for Rudis..."
+            sleep 1
+          done
+          echo "Rudis failed to start"
+          exit 1
+
+      - name: Wait for Spring Boot
+        run: |
+          for i in {1..60}; do
+            if curl -f http://localhost:8090/actuator/health > /dev/null 2>&1; then
+              echo "✓ Spring Boot is healthy"
+              exit 0
+            fi
+            echo "Attempt $i: Waiting for Spring Boot..."
+            sleep 1
+          done
+          echo "Spring Boot failed to start"
+          docker compose logs spring-be
+          exit 1
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Clean up
+        if: always()
+        run: docker compose down

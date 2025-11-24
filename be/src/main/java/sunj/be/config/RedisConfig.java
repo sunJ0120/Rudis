@@ -3,6 +3,7 @@ package sunj.be.config;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.protocol.ProtocolVersion;
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -14,6 +15,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
+
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         ClientOptions clientOptions = ClientOptions.builder()
@@ -27,8 +35,8 @@ public class RedisConfig {
                 .build();
 
         RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration();
-        serverConfig.setHostName("localhost");
-        serverConfig.setPort(6379);
+        serverConfig.setHostName(redisHost);
+        serverConfig.setPort(redisPort);
 
         return new LettuceConnectionFactory(serverConfig, clientConfig);
     }

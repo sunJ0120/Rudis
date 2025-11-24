@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("종료를 원하시면 'EXIT'를 눌러주세요.");
             println!();
             s
-        },
+        }
         Err(e) => {
             eprintln!("😭 서버 연결 실패: {}", e);
             return Err(e.into());
@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // 입력 받기
         let mut input = String::new();
         match io::stdin().read_line(&mut input) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => {
                 eprintln!("😭 입력 하신 것을 읽는데 실패하였습니다. : {}", e);
                 continue;
@@ -58,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(0) => {
                 eprintln!("🦀 서버 연결이 종료되었습니다.");
                 break;
-            },
+            }
             Ok(n) => n,
             Err(e) => {
                 eprintln!("😭 서버 응답 읽기 실패: {}", e);
@@ -82,9 +82,9 @@ fn print_response(resp: &str) {
 
     let first = lines[0];
 
-    if first.starts_with('+') {
+    if let Some(stripped) = first.strip_prefix('+') {
         // +OK
-        println!("{}", &first[1..]);
+        println!("{}", stripped);
     } else if first.starts_with('-') {
         // -ERR message
         println!("{}", first);

@@ -1,16 +1,16 @@
+use rudis::{Command, RespValue, Store};
 use std::sync::Arc;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
-use rudis::{Command, RespValue, Store};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    let listener = TcpListener::bind("127.0.0.1:6379").await?;
-    println!("🦀 Rudis 서버가 127.0.0.1:6379 에서 실행 중입니다.");
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let listener = TcpListener::bind("0.0.0.0:6379").await?;
+    println!("🦀 Rudis 서버가 포트 6379 에서 실행 중입니다.");
 
     let store = Arc::new(Store::new());
 
-    loop{
+    loop {
         let (socket, addr) = listener.accept().await?;
         println!("🥳 새로운 연결: {}", addr);
 
@@ -22,18 +22,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
     }
 }
 
-async fn handle_connection(
-    mut socket: TcpStream,
-    store: Arc<Store>
-){
+async fn handle_connection(mut socket: TcpStream, store: Arc<Store>) {
     let mut buf = vec![0; 1024];
 
-    loop{
+    loop {
         let n = match socket.read(&mut buf).await {
             Ok(0) => {
                 println!("🦀 클라이언트 연결이 종료되었습니다.");
                 return;
-            },
+            }
             Ok(n) => n,
             Err(e) => {
                 eprintln!("😭 소켓에서 데이터를 읽는데 실패하였습니다: {}", e);
@@ -42,7 +39,7 @@ async fn handle_connection(
         };
 
         let input = String::from_utf8_lossy(&buf[..n]);
-        let input = input.trim().to_string();  // ← String으로 변환
+        let input = input.trim().to_string(); // ← String으로 변환
 
         // 각 *로 시작하는 명령어들 분리
         let mut commands = Vec::new();
@@ -70,19 +67,15 @@ async fn handle_connection(
             // 여기서부터 기존 처리 로직 시작
             let command_string = if cmd_input.starts_with('*') {
                 match RespValue::parse(cmd_input) {
-                    Ok(resp) => {
-                        match resp.to_command_string() {
-                            Ok(cmd) => {
-                                cmd
-                            },
-                            Err(e) => {
-                                let error_resp = format!("-ERR {}\r\n", e);
-                                let _ = socket.write_all(error_resp.as_bytes()).await;
-                                let _ = socket.flush().await;
-                                continue;
-                            }
+                    Ok(resp) => match resp.to_command_string() {
+                        Ok(cmd) => cmd,
+                        Err(e) => {
+                            let error_resp = format!("-ERR {}\r\n", e);
+                            let _ = socket.write_all(error_resp.as_bytes()).await;
+                            let _ = socket.flush().await;
+                            continue;
                         }
-                    }
+                    },
                     Err(e) => {
                         let error_resp = format!("-ERR RESP 파싱 실패: {}\r\n", e);
                         let _ = socket.write_all(error_resp.as_bytes()).await;
@@ -100,20 +93,20 @@ async fn handle_connection(
                     let response = cmd.execute(&store);
                     let resp_response = to_resp_format(&response);
 
-                    if let Err(e) = socket.write_all(resp_response.as_bytes()).await {
+                    if let Err(_e) = socket.write_all(resp_response.as_bytes()).await {
                         return;
                     }
 
-                    if let Err(e) = socket.flush().await {
+                    if let Err(_e) = socket.flush().await {
                         return;
                     }
                 }
                 Err(e) => {
                     let error_resp = format!("-ERR {}\r\n", e);
-                    if let Err(e) = socket.write_all(error_resp.as_bytes()).await {
+                    if let Err(_e) = socket.write_all(error_resp.as_bytes()).await {
                         return;
                     }
-                    if let Err(e) = socket.flush().await {
+                    if let Err(_e) = socket.flush().await {
                         return;
                     }
                 }
@@ -130,6 +123,6 @@ fn to_resp_format(response: &str) -> String {
         "(nil)" => "$-1\r\n".to_string(),
         s if s.starts_with("ERR") => format!("-{}\r\n", s),
         s if s.parse::<i64>().is_ok() => format!(":{}\r\n", s),
-        s => format!("${}\r\n{}\r\n", s.len(), s)
+        s => format!("${}\r\n{}\r\n", s.len(), s),
     }
 }

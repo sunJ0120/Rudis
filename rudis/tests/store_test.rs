@@ -1,32 +1,32 @@
 #[cfg(test)]
 mod tests {
+    use rudis::Store;
     use std::thread;
     use std::time::Duration;
-    use rudis::Store;
 
     #[test]
-    fn test_set(){
+    fn test_set() {
         let store = Store::new();
         store.set("key", "rudis");
         assert_eq!(store.get("key"), Some("rudis".to_string()));
     }
 
     #[test]
-    fn test_set_init_expire(){
+    fn test_set_init_expire() {
         let store = Store::new();
         store.set("key", "rudis");
         assert_eq!(store.ttl("key"), -1);
     }
 
     #[test]
-    fn test_get_nonexistent_key(){
+    fn test_get_nonexistent_key() {
         let store = Store::new();
         let result = store.get("not_exist");
         assert_eq!(result, None);
     }
 
     #[test]
-    fn test_get_expired_key(){
+    fn test_get_expired_key() {
         let store = Store::new();
         store.set("key", "rudis");
         store.expire("key", 1);
@@ -53,7 +53,7 @@ mod tests {
     }
 
     #[test]
-    fn test_expire_basic(){
+    fn test_expire_basic() {
         let store = Store::new();
         store.set("key", "rudis");
 

@@ -39,7 +39,7 @@ jobs:
             sleep 2
           done
           echo "Spring Boot failed to start. Logs:"
-          docker compose logs spring-be
+          docker compose logs spring-load-tester
           exit 1
 
       - name: Logs on failure

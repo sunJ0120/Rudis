@@ -88,6 +88,94 @@ RUST_ST/
 └── .gitignore
 ```
 
+------
+
+## 🚀 빠른 시작
+
+### 전체 스택 실행 (Rudis + Spring Boot + 모니터링)
+```bash
+# 1. 백그라운드로 모든 서비스 실행
+docker-compose up -d
+
+# 2. 서비스 상태 확인
+docker-compose ps
+
+# 3. 헬스 체크
+curl http://localhost:8090/actuator/health
+# 응답: {"groups":["liveness","readiness"],"status":"UP"}
+```
+
+### 서비스 접속 정보
+
+| 서비스 | 포트   | URL | 설명 |
+|--------|------|-----|------|
+| 🦀 Rudis | 6380  | localhost:6380 | Redis 클론 서버 |
+| ☕ Spring Boot | 8090 | http://localhost:8090 | 테스트 API 서버 |
+| 📝 Swagger UI | 8090 | http://localhost:8090/swagger-ui.html | API 문서 & 테스트 |
+| 📊 Prometheus | 9090 | http://localhost:9090 | 메트릭 수집 |
+| 📈 Grafana | 3000 | http://localhost:3000 | 대시보드 (admin/admin) |
+
+### API 테스트 방법
+
+#### 1️⃣ Swagger UI로 테스트 (추천)
+
+브라우저에서 http://localhost:8090/swagger-ui.html 접속
+```
+1. 원하는 API 엔드포인트 클릭
+2. "Try it out" 버튼 클릭
+3. 파라미터 입력
+4. "Execute" 버튼으로 실행
+5. 실시간으로 Rudis 연동 확인!
+```
+
+#### 2️⃣ curl로 테스트
+```bash
+# 예시: SET 명령
+curl -X POST http://localhost:8090/api/redis/set \
+  -H "Content-Type: application/json" \
+  -d '{"key":"test", "value":"hello"}'
+
+# 예시: GET 명령
+curl http://localhost:8090/api/redis/get/test
+```
+
+### Rudis 직접 테스트
+```bash
+# Redis CLI로 연결
+docker run --rm -it --network host redis:latest redis-cli -h localhost -p 6380
+
+# 명령어 테스트
+> PING
+PONG
+> SET mykey "Hello Rudis!"
+OK
+> GET mykey
+"Hello Rudis!"
+```
+
+### 로그 확인
+```bash
+# 전체 로그
+docker-compose logs -f
+
+# Rudis만
+docker-compose logs -f rudis
+
+# Spring Boot만
+docker-compose logs -f spring-be
+```
+
+### 중지 및 정리
+```bash
+# 서비스 중지
+docker-compose down
+
+# 볼륨까지 완전 삭제
+docker-compose down -v
+```
+
+------
+
 ## 📚 각 단계별 상세 내용
 
 [📌 rust_study : 러스트 기본 문법 공부집](https://github.com/sunJ0120/Rudis/blob/main/rust_study/README.md)

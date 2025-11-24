@@ -5,8 +5,8 @@ use tokio::net::{TcpListener, TcpStream};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let listener = TcpListener::bind("0.0.0.0:6379").await?;
-    println!("🦀 Rudis 서버가 포트 6379 에서 실행 중입니다.");
+    let listener = TcpListener::bind("0.0.0.0:6380").await?;
+    println!("🦀 Rudis 서버가 포트 6380 에서 실행 중입니다.");
 
     let store = Arc::new(Store::new());
 

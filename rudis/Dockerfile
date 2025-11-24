@@ -8,6 +8,6 @@ COPY . .
 
 RUN cargo build --release
 
-EXPOSE 6379
+EXPOSE 6380
 
 CMD ["./target/release/rudis"]

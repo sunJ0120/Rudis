@@ -36,7 +36,7 @@ docker compose up -d
 
 ### 사용
 ```bash
-redis-cli -h localhost -p 6379
+redis-cli -h localhost -p 6380
 > PING
 > SET key value
 > GET key
@@ -45,7 +45,7 @@ redis-cli -h localhost -p 6379
 #### Rudis와 함께 전체 스택 실행
 ```bash
 docker compose up -d
-# Rudis: localhost:6379
+# Rudis: localhost:6380
 # Spring Boot: localhost:8090
 # Prometheus: localhost:9090
 # Grafana: localhost:3000

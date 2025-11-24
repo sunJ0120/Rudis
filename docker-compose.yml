@@ -6,13 +6,13 @@ services:
       dockerfile: Dockerfile
     container_name: rudis-server
     ports:
-      - "6379:6379"
+      - "6380:6380"
     networks:
       - rudis-network
     environment:
       - RUST_LOG=info
     healthcheck:
-      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6379", "PING"]
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6380", "PING"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -35,7 +35,7 @@ services:
       - app-network
     environment:
       - SPRING_DATA_REDIS_HOST=rudis
-      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PORT=6380
 #      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=prometheus
 
   # Prometheus: 메트릭 수집

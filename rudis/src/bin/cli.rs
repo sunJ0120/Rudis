@@ -5,9 +5,9 @@ use tokio::net::TcpStream;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🦀 Rudis CLI v0.1.0");
-    println!("서버에 연결 중... 127.0.0.1:6379");
+    println!("서버에 연결 중... 127.0.0.1:6380");
 
-    let mut stream = match TcpStream::connect("127.0.0.1:6379").await {
+    let mut stream = match TcpStream::connect("127.0.0.1:6380").await {
         Ok(s) => {
             println!("🥳 서버 연결 성공!");
             println!("종료를 원하시면 'EXIT'를 눌러주세요.");

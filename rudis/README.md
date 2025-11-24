@@ -22,8 +22,8 @@ Rust를 학습하면서 느낀 점은, Rust가 기존 C++과 C언어의 여러 �
 | MVP | 단계 | 상태 | 블로그 글                                                                                                                                                                                                                                                                                                                             |
 |-----|------|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **MVP1** | CLI 기반 인메모리 DB | ✅ | [🦀 Rudis 프로젝트 : 기획](https://hot-and-spicy0120.tistory.com/38)<br>[🦀 Rudis 프로젝트 : Redis 찍먹하면서 요구사항 정리하기](https://hot-and-spicy0120.tistory.com/39)<br>[🦀 Rudis 프로젝트 : Phase 1. 기본 명령어와 test 구현하기](https://hot-and-spicy0120.tistory.com/40)<br>[🦀 Rudis 프로젝트 : Phase 1. CLI DB 구현하기](https://hot-and-spicy0120.tistory.com/44) |
-| **MVP2** | TCP 기반 멀티클라이언트 서버 | ✅ | [🦀 Rudis 프로젝트 : Phase 2. TCP 서버 구축하기 & Phase 2 목표 정리](https://hot-and-spicy0120.tistory.com/41)<br>[🦀 Rudis 프로젝트 : Phase 2. Rudis TCP 서버 구현하기](https://hot-and-spicy0120.tistory.com/46)                                                                                                                               |
-| **MVP3** | RESP 프로토콜 + Spring Boot 연동 + Docker + CI/CD + Prometheus & Grafana | 🔄 |                                                                                                                                                                                                                                                                                                                           |
+| **MVP2** | TCP 기반 멀티클라이언트 서버 | ✅ | [🦀 Rudis 프로젝트 : Phase 2. TCP 서버 구축하기 & Phase 2 목표 정리](https://hot-and-spicy0120.tistory.com/41)<br>[🦀 Rudis 프로젝트 : Phase 2. Rudis TCP 서버 구현하기](https://hot-and-spicy0120.tistory.com/46)                                                                                                                                        |
+| **MVP3** | RESP 프로토콜 + Spring Boot 연동 + Docker + CI/CD + Prometheus & Grafana | ✅ | [🦀Rudis 프로젝트 : Parse 3. spring boot crud api 만들어서 성능 테스트](https://hot-and-spicy0120.tistory.com/47)<br>[🦀Rudis 프로젝트 : Parse 3. RESP 프로토콜을 구현하며 겪은 여러 문제들과 체험 삽질의 현장…](https://hot-and-spicy0120.tistory.com/48)<br>[🦀Rudis 프로젝트 : Parse 3. CI 구축하기 - 통과할 때까지 돌려라!](https://hot-and-spicy0120.tistory.com/49)                   |
 
 ---
 
@@ -99,7 +99,7 @@ docker compose up -d
 
 ###  모니터링 & 운영
 - ✅ Docker Compose로 전체 스택 통합 관리
-<!-- - ✅ Prometheus & Grafana를 통한 실시간 성능 모니터링 -->
+- ✅ Prometheus & Grafana를 통한 실시간 성능 모니터링
 
 
 ## 📂 파일 구조

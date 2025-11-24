@@ -43,6 +43,9 @@ Rust의 소유권, 비동기 프로그래밍, 시스템 프로그래밍을 통�
 - ✅ **RESP 프로토콜** - Redis 호환성 구현
 - ✅ **Docker & CI/CD** - 프로덕션 레벨 배포 자동화
 
+## ⚙️ 기술 스택
+![Tech Stack](https://skillicons.dev/icons?i=rust,spring,docker,prometheus,grafana,github)
+
 ## 📁 프로젝트 구조
 ```
 RUST_ST/

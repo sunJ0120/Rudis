@@ -18,7 +18,7 @@ services:
       retries: 5
 
   # Spring Boot 성능 테스트 서버
-  spring-load-tester:
+  spring-be:
     build:
       context: ./be
       dockerfile: Dockerfile
@@ -33,8 +33,8 @@ services:
     networks:
       - rudis-network
     environment:
-      REDIS_HOST: rudis
-      REDIS_PORT: "6379"
+      - SPRING_DATA_REDIS_HOST=rudis
+      - SPRING_DATA_REDIS_PORT=6379
 #      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=prometheus
 
   # Prometheus: 메트릭 수집

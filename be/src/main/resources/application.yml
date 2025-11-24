@@ -11,7 +11,7 @@ spring:
   data:
     redis:
       host: rudis
-      port: "6379"
+      port: 6379
 
 management:
   endpoints:

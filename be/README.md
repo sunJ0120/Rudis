@@ -60,7 +60,7 @@ be/
 
 ---
 
-## 📊 모니터링 (예정)
+## 📊 모니터링
 
-- Prometheus 메트릭 수집 예정
-- Grafana 대시보드 구축 예정
+- Prometheus 메트릭 수집
+- Grafana 대시보드 구축

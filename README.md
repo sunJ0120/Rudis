@@ -23,7 +23,7 @@ Rust가 쉽지 않다는 건 이미 알고 있었지만, 우테코에서 말하�
 Rust의 소유권, 비동기 프로그래밍, 시스템 프로그래밍을 통합적으로
 경험할 수 있는 실제 작동하는 MemoryDB 애플리케이션입니다.
 
-<!--[자세한 정보 → rudis/README.md](rudis/README.md)-->
+[📌 자세한 정보 → rudis/README.md](https://github.com/sunJ0120/Rudis/blob/main/rudis/README.md)
 
 ## 📅 프로젝트 진행 타임라인
 
@@ -34,7 +34,7 @@ Rust의 소유권, 비동기 프로그래밍, 시스템 프로그래밍을 통�
 | 2025-11-16 ~ 2025-11-17 | 1차 MVP 완성 & TCP 기반 통신 구현을 위해 Tokio와 비동기 학습             | ✅ |
 | 2025-11-22              | TCP 서버 구현 완료 & CLI를 서버 기반으로 변경해서 2차 MVP 완성             | ✅ |
 | 2025-11-23              | 스프링 부트 서버 구성 & RESP 프로토콜 재정의하여 spring-data-redis와 연동 완료 | ✅ |
-| 2025-11-24              | docker를 통한 컨테이너화 & ci 파이프라인 구축 완료                      | ✅ |
+| 2025-11-24              | docker를 통한 컨테이너화 & ci 파이프라인 구축 완료 및 모니터링 검증 완료         | ✅ |
 
 ## 🎯 핵심 성과
 
@@ -42,6 +42,10 @@ Rust의 소유권, 비동기 프로그래밍, 시스템 프로그래밍을 통�
 - ✅ **Tokio 비동기 프로그래밍** - 멀티클라이언트 TCP 서버 구현
 - ✅ **RESP 프로토콜** - Redis 호환성 구현
 - ✅ **Docker & CI/CD** - 프로덕션 레벨 배포 자동화
+- ✅ **Prometheus & Grafana 모니터링** - 실시간 성능 추적 및 안정성 검증
+- ✅ **25분 부하 테스트 검증** - 500+ 동시 요청 처리 중 메모리 누수 없음 확인
+
+![img.png](monitoring_25min.png)
 
 ## ⚙️ 기술 스택
 ![Tech Stack](https://skillicons.dev/icons?i=rust,spring,docker,prometheus,grafana,github)
@@ -79,14 +83,22 @@ RUST_ST/
 │   └── docker-build.yml               # Docker 이미지 빌드
 │
 ├── 🐳 docker-compose.yml              # 전체 스택 (Rudis + Spring + Prometheus + Grafana)
-│
+├── 🔥 prometheus.yml                  # prometheus 설정
 ├── 📄 README.md                       # (현재 파일)
 └── .gitignore
 ```
 
 ## 📚 각 단계별 상세 내용
 
-<!--[메인 README로 돌아가기](../README.md)-->
+[📌 rust_study : 러스트 기본 문법 공부집](https://github.com/sunJ0120/Rudis/blob/main/rust_study/README.md)
+
+[📌 tokio_study : Tokio 기본 문법 공부집](https://github.com/sunJ0120/Rudis/blob/main/tokio_study/README.md)
+
+[📌 Rudis : 나만의 아주 작은 Redis](https://github.com/sunJ0120/Rudis/blob/main/rudis/README.md)
+
+[📌 spring_be 서버 : Rudis 테스트 api](https://github.com/sunJ0120/Rudis/blob/main/be/README.md)
+
+> 각각의 리드미에 들어가면 각 폴더에 대한 설명과 공부 기록 문서가 존재합니다.
 
 -----
 
@@ -94,4 +106,4 @@ RUST_ST/
 
 [🦀 우테코 8기 도전기](https://hot-and-spicy0120.tistory.com/category/%EA%B0%9C%EC%9D%B8%20%EB%82%99%EC%84%9C%EC%9E%A5/%EC%9A%B0%ED%85%8C%EC%BD%94%208%EA%B8%B0%20%EB%8F%84%EC%A0%84%EA%B8%B0)
 
-
+> 해당 카테고리의 모든 글을 참고해주세요!!

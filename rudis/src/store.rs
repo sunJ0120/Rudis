@@ -7,6 +7,12 @@ pub struct Store {
     expiry: Arc<Mutex<HashMap<String, Instant>>>,
 }
 
+impl Default for Store {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Store{
     pub fn new() -> Self {
         Store {

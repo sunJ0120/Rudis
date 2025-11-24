@@ -100,20 +100,20 @@ async fn handle_connection(
                     let response = cmd.execute(&store);
                     let resp_response = to_resp_format(&response);
 
-                    if let Err(e) = socket.write_all(resp_response.as_bytes()).await {
+                    if let Err(_e) = socket.write_all(resp_response.as_bytes()).await {
                         return;
                     }
 
-                    if let Err(e) = socket.flush().await {
+                    if let Err(_e) = socket.flush().await {
                         return;
                     }
                 }
                 Err(e) => {
                     let error_resp = format!("-ERR {}\r\n", e);
-                    if let Err(e) = socket.write_all(error_resp.as_bytes()).await {
+                    if let Err(_e) = socket.write_all(error_resp.as_bytes()).await {
                         return;
                     }
-                    if let Err(e) = socket.flush().await {
+                    if let Err(_e) = socket.flush().await {
                         return;
                     }
                 }

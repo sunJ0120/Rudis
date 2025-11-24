@@ -22,7 +22,7 @@ pub enum Command {
 impl Command {
     // CLI에서 입력된 문자열을 Command enum으로 파싱하는 함수
     pub fn parse(input: &str) -> Result<Command, String> {
-        let parts: Vec<&str> = input.trim().split_whitespace().collect();
+        let parts: Vec<&str> = input.split_whitespace().collect();
 
         match parts.as_slice() {
             ["SET", key, value] => Ok(Command::Set{

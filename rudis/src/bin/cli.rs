@@ -82,9 +82,9 @@ fn print_response(resp: &str) {
 
     let first = lines[0];
 
-    if first.starts_with('+') {
+    if let Some(stripped) = first.strip_prefix('+') {
         // +OK
-        println!("{}", &first[1..]);
+        println!("{}", stripped);
     } else if first.starts_with('-') {
         // -ERR message
         println!("{}", first);

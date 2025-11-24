@@ -25,8 +25,9 @@ impl RespValue {
 
     // Array 파싱: *3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n
     fn parse_array(input: &str) -> Result<Self, String> {
-        let lines: Vec<&str> = input.split("\r\n")
-            .filter(|s| !s.is_empty())  // ← 빈 줄 제거
+        let lines: Vec<&str> = input
+            .split("\r\n")
+            .filter(|s| !s.is_empty()) // ← 빈 줄 제거
             .collect();
 
         if lines.is_empty() {
@@ -34,7 +35,8 @@ impl RespValue {
         }
 
         let count_str = &lines[0][1..];
-        let count: usize = count_str.parse()
+        let count: usize = count_str
+            .parse()
             .map_err(|_| "Array 개수 파싱 실패".to_string())?;
 
         let mut elements = Vec::new();
@@ -47,11 +49,15 @@ impl RespValue {
 
             // Bulk String 파싱: $3\r\nSET
             if !lines[line_idx].starts_with('$') {
-                return Err(format!("Array 요소는 Bulk String이어야 합니다. 받은 것: {}", lines[line_idx]));
+                return Err(format!(
+                    "Array 요소는 Bulk String이어야 합니다. 받은 것: {}",
+                    lines[line_idx]
+                ));
             }
 
             let len_str = &lines[line_idx][1..];
-            let bulk_len: usize = len_str.parse()
+            let bulk_len: usize = len_str
+                .parse()
                 .map_err(|_| "Bulk String 길이 파싱 실패".to_string())?;
 
             line_idx += 1;
@@ -74,16 +80,15 @@ impl RespValue {
     }
 
     fn parse_bulk_string(input: &str) -> Result<Self, String> {
-        let lines: Vec<&str> = input.split("\r\n")
-            .filter(|s| !s.is_empty())
-            .collect();
+        let lines: Vec<&str> = input.split("\r\n").filter(|s| !s.is_empty()).collect();
 
         if lines.is_empty() {
             return Err("잘못된 Bulk String 형식입니다.".to_string());
         }
 
         let len_str = &lines[0][1..];
-        if len_str == "-1" {  // Null 체크를 앞에 둔다.
+        if len_str == "-1" {
+            // Null 체크를 앞에 둔다.
             return Ok(RespValue::Null);
         }
 
@@ -95,7 +100,8 @@ impl RespValue {
     }
 
     fn parse_simple_string(input: &str) -> Result<Self, String> {
-        let content = input.trim_start_matches('+')
+        let content = input
+            .trim_start_matches('+')
             .trim_end_matches("\r\n")
             .to_string();
         Ok(RespValue::SimpleString(content))
@@ -104,12 +110,11 @@ impl RespValue {
     pub fn to_command_string(&self) -> Result<String, String> {
         match self {
             RespValue::Array(elements) => {
-                let strings: Result<Vec<String>, String> = elements.iter()
-                    .map(|e| {
-                        match e {
-                            RespValue::BulkString(s) => Ok(s.clone()),
-                            _ => Err("Array 요소가 BulkString이 아닙니다.".to_string()),
-                        }
+                let strings: Result<Vec<String>, String> = elements
+                    .iter()
+                    .map(|e| match e {
+                        RespValue::BulkString(s) => Ok(s.clone()),
+                        _ => Err("Array 요소가 BulkString이 아닙니다.".to_string()),
                     })
                     .collect();
 

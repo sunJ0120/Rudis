@@ -21,7 +21,7 @@ jobs:
 
       - name: Wait for services
         run: |
-          sleep 10
+          sleep 60
           docker compose ps
 
       - name: Health check - Rudis
@@ -30,7 +30,7 @@ jobs:
 
       - name: Health check - Spring Boot
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -f http://localhost:8080/actuator/health > /dev/null 2>&1; then
               echo "Spring Boot is healthy"
               exit 0
@@ -38,6 +38,8 @@ jobs:
             echo "Attempt $i: Waiting for Spring Boot..."
             sleep 2
           done
+          echo "Spring Boot failed to start. Logs:"
+          docker compose logs spring-be
           exit 1
 
       - name: Logs on failure

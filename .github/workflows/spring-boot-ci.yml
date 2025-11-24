@@ -24,7 +24,9 @@ jobs:
 
       - name: Build with Gradle
         working-directory: be
-        run: ./gradlew build -x test
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build -x test
 
       - name: Run tests
         working-directory: be

@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
     container_name: spring-be
     ports:
-      - "8080:8080"
+      - "8090:8090"
     depends_on:
       rudis:
         condition: service_healthy

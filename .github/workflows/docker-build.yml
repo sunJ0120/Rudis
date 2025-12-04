@@ -2,11 +2,11 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   workflow_run:
     workflows: [ "Rudis CI", "Spring Boot CI", "Integration Test" ]
     types: [ completed ]
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
   build:

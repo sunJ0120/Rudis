@@ -2,33 +2,49 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   workflow_run:
     workflows: [ "Rudis CI", "Spring Boot CI", "Integration Test" ]
     types: [ completed ]
-    branches: [ main ]
+    branches: [ main, develop ]
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
 
 jobs:
-  build:
+  build-and-push:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Build Rudis image
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Rudis image
         uses: docker/build-push-action@v5
         with:
           context: ./rudis
-          push: false
-          tags: rudis:latest
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/rudis:latest
+            ${{ steps.login-ecr.outputs.registry }}/rudis:${{ github.sha }}
 
-      - name: Build Spring Boot image
+      - name: Build and push Spring Boot image
         uses: docker/build-push-action@v5
         with:
           context: ./be
-          push: false
-          tags: spring-boot-tester:latest
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/rudis-spring-be:latest
+            ${{ steps.login-ecr.outputs.registry }}/rudis-spring-be:${{ github.sha }}
